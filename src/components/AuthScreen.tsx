@@ -54,7 +54,10 @@ export default function AuthScreen() {
       {/* Header */}
       <div className="app-header" style={{ flex: 'none' }}>
         <div className="header-top">
-          <div className="header-logo">Home<span>Team</span></div>
+          <div className="header-logo" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <img src="/logo.svg" alt="" width="26" height="26" style={{ flexShrink: 0 }} />
+            Home<span>Team</span>
+          </div>
         </div>
         <div className="header-subtitle">Family sports logistics, sorted</div>
       </div>

@@ -2,10 +2,10 @@
   <!-- House / shield body -->
   <polygon points="50,8 93,40 93,91 7,91 7,40" fill="#1a2744"/>
 
-  <!-- Roof face -->
+  <!-- Roof face (slightly lighter for depth) -->
   <polygon points="50,8 93,40 7,40" fill="#253a6b"/>
 
-  <!-- Blue accent bar -->
+  <!-- Blue accent bar at roofline -->
   <rect x="7" y="38.5" width="86" height="4" fill="#60a5fa"/>
 
   <!-- H letterform -->
@@ -17,7 +17,7 @@
   <rect x="48" y="52" width="22" height="5" rx="1.5" fill="white"/>
   <rect x="56.5" y="52" width="5" height="26" rx="1.5" fill="white"/>
 
-  <!-- Roof peak accent -->
+  <!-- Roof peak accent lines (subtle) -->
   <polyline points="30,36 50,20 70,36"
     stroke="#60a5fa" stroke-width="2" stroke-linecap="round"
     stroke-linejoin="round" opacity="0.45"/>
