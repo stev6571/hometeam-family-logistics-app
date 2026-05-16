@@ -3,7 +3,7 @@ import type { Session } from '@supabase/supabase-js';
 import './index.css';
 import type { Tab, AppState } from './types';
 import { initialState } from './mockData';
-import { supabase } from './lib/supabase';
+import { supabase, supabaseMisconfigured } from './lib/supabase';
 import { loadUserState, saveUserState } from './lib/db';
 import AuthScreen from './components/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -107,6 +107,8 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setAuthLoading(false);
+    }).catch(() => {
+      setAuthLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -165,6 +167,15 @@ export default function App() {
   };
 
   // ── Render gates ──────────────────────────────────────────────────────────
+  if (supabaseMisconfigured) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100dvh', padding: 32, fontFamily: 'sans-serif', textAlign: 'center', background: '#1a2744', color: 'white', gap: 16 }}>
+      <img src="/logo.svg" width="56" height="56" alt="" />
+      <div style={{ fontSize: 20, fontWeight: 700 }}>Supabase not configured</div>
+      <div style={{ fontSize: 14, opacity: 0.7, maxWidth: 320 }}>
+        Add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> to your Vercel environment variables, then redeploy.
+      </div>
+    </div>
+  );
   if (authLoading) return <LoadingScreen message="Starting up…" />;
   if (!session)    return <AuthScreen />;
   if (dataLoading) return <LoadingScreen message="Loading your family data…" />;
