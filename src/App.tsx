@@ -4,8 +4,9 @@ import './index.css';
 import type { Tab, AppState } from './types';
 import { initialState } from './mockData';
 import { supabase, supabaseMisconfigured } from './lib/supabase';
-import { loadUserState, saveUserState } from './lib/db';
+import { getFamilyForUser, getJoinCode, loadUserState, saveUserState } from './lib/db';
 import AuthScreen from './components/AuthScreen';
+import FamilySetupScreen from './screens/FamilySetupScreen';
 import HomeScreen from './screens/HomeScreen';
 import LiftsScreen from './screens/LiftsScreen';
 import KitScreen from './screens/KitScreen';
@@ -50,31 +51,54 @@ function LoadingScreen({ message }: { message: string }) {
 
 // ─── User menu ────────────────────────────────────────────────────────────────
 
-function UserMenu({ email, onSignOut }: { email: string; onSignOut: () => void }) {
-  const [open, setOpen] = useState(false);
+function UserMenu({ email, joinCode, onSignOut }: { email: string; joinCode: string; onSignOut: () => void }) {
+  const [open, setCopied] = useState(false);
+  const [copied, setIsCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) setCopied(false);
     }
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(joinCode).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+  };
+
   const initial = email.charAt(0).toUpperCase();
 
   return (
     <div className="user-menu" ref={ref}>
-      <button className="user-avatar-btn" onClick={() => setOpen(o => !o)}>
+      <button className="user-avatar-btn" onClick={() => setCopied(o => !o)}>
         {initial}
       </button>
       {open && (
         <div className="user-dropdown">
           <div className="user-dropdown-email">{email}</div>
+          <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>Family join code</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, letterSpacing: 4, color: '#60a5fa' }}>
+                {joinCode}
+              </span>
+              <button
+                onClick={handleCopy}
+                style={{ background: 'rgba(96,165,250,0.15)', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, color: '#60a5fa', cursor: 'pointer', fontWeight: 600 }}
+              >
+                {copied ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.4, marginTop: 4 }}>Share this code to add a partner</div>
+          </div>
           <button
             className="user-dropdown-item danger"
-            onClick={() => { setOpen(false); onSignOut(); }}
+            onClick={() => { setCopied(false); onSignOut(); }}
           >
             🚪 Sign out
           </button>
@@ -87,20 +111,18 @@ function UserMenu({ email, onSignOut }: { email: string; onSignOut: () => void }
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [session, setSession]       = useState<Session | null>(null);
+  const [session, setSession]         = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [familyId, setFamilyId]       = useState<string | null>(null);
+  const [familyLoading, setFamilyLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
+  const [joinCode, setJoinCode]       = useState('------');
 
   const [activeTab, setActiveTab]   = useState<Tab>('home');
   const [state, setState]           = useState<AppState>(initialState);
   const [voiceOpen, setVoiceOpen]   = useState(false);
   const [driveMode, setDriveMode]   = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
-  const [userMenuOpen, setUserMenuOpen] = useState(false); // kept for potential future use
-
-  // Suppress unused warning — kept for future use
-  void userMenuOpen;
-  void setUserMenuOpen;
 
   // ── Auth state listener ────────────────────────────────────────────────────
   useEffect(() => {
@@ -113,29 +135,47 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (!session) {
+        setFamilyId(null);
+        setJoinCode('------');
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // ── Load user data when session starts ────────────────────────────────────
+  // ── Look up family when session starts ────────────────────────────────────
   useEffect(() => {
     if (!session) return;
 
-    setDataLoading(true);
-    loadUserState(session.user.id)
-      .then(s => setState(s))
-      .finally(() => setDataLoading(false));
+    setFamilyLoading(true);
+    getFamilyForUser(session.user.id)
+      .then(id => setFamilyId(id))
+      .finally(() => setFamilyLoading(false));
   }, [session]);
+
+  // ── Load app state when family is known ───────────────────────────────────
+  useEffect(() => {
+    if (!familyId) return;
+
+    setDataLoading(true);
+    Promise.all([
+      loadUserState(familyId),
+      getJoinCode(familyId),
+    ]).then(([appState, code]) => {
+      setState(appState);
+      setJoinCode(code);
+    }).finally(() => setDataLoading(false));
+  }, [familyId]);
 
   // ── Debounced save whenever state changes ─────────────────────────────────
   useEffect(() => {
-    if (!session || dataLoading) return;
+    if (!familyId || dataLoading) return;
 
     setSaveStatus('saving');
     const timer = setTimeout(async () => {
       try {
-        await saveUserState(session.user.id, state);
+        await saveUserState(familyId, state);
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
       } catch {
@@ -176,8 +216,14 @@ export default function App() {
       </div>
     </div>
   );
-  if (authLoading) return <LoadingScreen message="Starting up…" />;
-  if (!session)    return <AuthScreen />;
+  if (authLoading || familyLoading) return <LoadingScreen message="Starting up…" />;
+  if (!session)   return <AuthScreen />;
+  if (!familyId)  return (
+    <FamilySetupScreen
+      userId={session.user.id}
+      onComplete={id => setFamilyId(id)}
+    />
+  );
   if (dataLoading) return <LoadingScreen message="Loading your family data…" />;
 
   const screenProps = { state, setState, setTab: setActiveTab };
@@ -192,12 +238,10 @@ export default function App() {
             Home<span>Team</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {/* Save indicator */}
             <div
               className={`save-dot ${saveStatus === 'saving' ? 'saving' : saveStatus === 'saved' ? 'saved' : saveStatus === 'error' ? 'error' : ''}`}
               title={saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved' : saveStatus === 'error' ? 'Save failed' : ''}
             />
-            {/* Drive mode */}
             <button
               onClick={() => { setDriveMode(true); setVoiceOpen(true); }}
               style={{
@@ -209,8 +253,7 @@ export default function App() {
             >
               🚘 Drive
             </button>
-            {/* User avatar / sign out */}
-            <UserMenu email={session.user.email ?? '?'} onSignOut={handleSignOut} />
+            <UserMenu email={session.user.email ?? '?'} joinCode={joinCode} onSignOut={handleSignOut} />
           </div>
         </div>
         <div className="header-subtitle">{tabTitles[activeTab]}</div>
