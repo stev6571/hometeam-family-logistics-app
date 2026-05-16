@@ -72,7 +72,13 @@ create policy "Family members can access app state"
     )
   );
 
--- ── 5. Re-attach updated_at trigger ──────────────────────────────────────────
+-- ── 5. Table privileges for the authenticated role ───────────────────────────
+-- Required when creating tables via SQL (dashboard auto-grants these, SQL doesn't)
+grant select, insert, update on public.families       to authenticated;
+grant select, insert         on public.family_members to authenticated;
+grant select, insert, update on public.user_app_data  to authenticated;
+
+-- ── 6. Re-attach updated_at trigger ──────────────────────────────────────────
 create or replace function public.handle_updated_at()
 returns trigger language plpgsql as $$
 begin new.updated_at = now(); return new; end;
