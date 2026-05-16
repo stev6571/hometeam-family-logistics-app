@@ -33,10 +33,20 @@ alter table public.families      enable row level security;
 alter table public.family_members enable row level security;
 alter table public.user_app_data  enable row level security;
 
--- Authenticated users can look up any family (needed to validate join codes)
+-- Authenticated users can create and look up families
 create policy "Authenticated users can read families"
   on public.families for select
   using (auth.role() = 'authenticated');
+
+create policy "Authenticated users can create families"
+  on public.families for insert
+  with check (auth.role() = 'authenticated');
+
+create policy "Family members can update their family"
+  on public.families for update
+  using (
+    id in (select family_id from public.family_members where user_id = auth.uid())
+  );
 
 -- Users can see their own memberships
 create policy "Users can read their memberships"
