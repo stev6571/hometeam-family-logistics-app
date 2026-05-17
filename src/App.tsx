@@ -4,9 +4,10 @@ import './index.css';
 import type { Tab, AppState } from './types';
 import { initialState } from './mockData';
 import { supabase, supabaseMisconfigured } from './lib/supabase';
-import { getFamilyForUser, getJoinCode, loadUserState, saveUserState } from './lib/db';
+import { getGroupsForUser, getJoinCode, loadUserState, saveUserState, createPersonalGroup } from './lib/db';
+import type { Group } from './lib/db';
 import AuthScreen from './components/AuthScreen';
-import FamilySetupScreen from './screens/FamilySetupScreen';
+import GroupModal from './components/GroupModal';
 import HomeScreen from './screens/HomeScreen';
 import LiftsScreen from './screens/LiftsScreen';
 import KitScreen from './screens/KitScreen';
@@ -52,13 +53,13 @@ function LoadingScreen({ message }: { message: string }) {
 // ─── User menu ────────────────────────────────────────────────────────────────
 
 function UserMenu({ email, joinCode, onSignOut }: { email: string; joinCode: string; onSignOut: () => void }) {
-  const [open, setCopied] = useState(false);
-  const [copied, setIsCopied] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setCopied(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -66,8 +67,8 @@ function UserMenu({ email, joinCode, onSignOut }: { email: string; joinCode: str
 
   const handleCopy = () => {
     navigator.clipboard.writeText(joinCode).then(() => {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     });
   };
 
@@ -75,30 +76,32 @@ function UserMenu({ email, joinCode, onSignOut }: { email: string; joinCode: str
 
   return (
     <div className="user-menu" ref={ref}>
-      <button className="user-avatar-btn" onClick={() => setCopied(o => !o)}>
+      <button className="user-avatar-btn" onClick={() => setOpen(o => !o)}>
         {initial}
       </button>
       {open && (
         <div className="user-dropdown">
           <div className="user-dropdown-email">{email}</div>
-          <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>Family join code</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, letterSpacing: 4, color: '#60a5fa' }}>
-                {joinCode}
-              </span>
-              <button
-                onClick={handleCopy}
-                style={{ background: 'rgba(96,165,250,0.15)', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, color: '#60a5fa', cursor: 'pointer', fontWeight: 600 }}
-              >
-                {copied ? '✓ Copied' : 'Copy'}
-              </button>
+          {joinCode && joinCode !== '------' && (
+            <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>Group join code</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, letterSpacing: 4, color: '#60a5fa' }}>
+                  {joinCode}
+                </span>
+                <button
+                  onClick={handleCopy}
+                  style={{ background: 'rgba(96,165,250,0.15)', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, color: '#60a5fa', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  {copied ? '✓ Copied' : 'Copy'}
+                </button>
+              </div>
+              <div style={{ fontSize: 11, opacity: 0.4, marginTop: 4 }}>Share to invite someone to this group</div>
             </div>
-            <div style={{ fontSize: 11, opacity: 0.4, marginTop: 4 }}>Share this code to add a partner</div>
-          </div>
+          )}
           <button
             className="user-dropdown-item danger"
-            onClick={() => { setCopied(false); onSignOut(); }}
+            onClick={() => { setOpen(false); onSignOut(); }}
           >
             🚪 Sign out
           </button>
@@ -111,12 +114,14 @@ function UserMenu({ email, joinCode, onSignOut }: { email: string; joinCode: str
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [session, setSession]         = useState<Session | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [familyId, setFamilyId]       = useState<string | null>(null);
-  const [familyLoading, setFamilyLoading] = useState(false);
-  const [dataLoading, setDataLoading] = useState(false);
-  const [joinCode, setJoinCode]       = useState('------');
+  const [session, setSession]           = useState<Session | null>(null);
+  const [authLoading, setAuthLoading]   = useState(true);
+  const [groups, setGroups]             = useState<Group[]>([]);
+  const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
+  const [groupsLoading, setGroupsLoading] = useState(false);
+  const [dataLoading, setDataLoading]   = useState(false);
+  const [joinCode, setJoinCode]         = useState('------');
+  const [showGroupModal, setShowGroupModal] = useState(false);
 
   const [activeTab, setActiveTab]   = useState<Tab>('home');
   const [state, setState]           = useState<AppState>(initialState);
@@ -136,7 +141,8 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (!session) {
-        setFamilyId(null);
+        setGroups([]);
+        setActiveGroupId(null);
         setJoinCode('------');
       }
     });
@@ -144,38 +150,51 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // ── Look up family when session starts ────────────────────────────────────
+  // ── Load all groups when session starts ───────────────────────────────────
   useEffect(() => {
     if (!session) return;
 
-    setFamilyLoading(true);
-    getFamilyForUser(session.user.id)
-      .then(id => setFamilyId(id))
-      .finally(() => setFamilyLoading(false));
+    setGroupsLoading(true);
+    getGroupsForUser(session.user.id).then(async loaded => {
+      if (loaded.length === 0) {
+        // First sign-in — auto-create personal space
+        const id = await createPersonalGroup(session.user.id);
+        const refreshed = await getGroupsForUser(session.user.id);
+        setGroups(refreshed);
+        setActiveGroupId(id);
+      } else {
+        setGroups(loaded);
+        // Restore last active group from localStorage, fall back to first
+        const saved = localStorage.getItem('ht-active-group');
+        const match = loaded.find(g => g.id === saved);
+        setActiveGroupId(match ? match.id : loaded[0].id);
+      }
+    }).finally(() => setGroupsLoading(false));
   }, [session]);
 
-  // ── Load app state when family is known ───────────────────────────────────
+  // ── Load app state when active group changes ──────────────────────────────
   useEffect(() => {
-    if (!familyId) return;
+    if (!activeGroupId) return;
 
+    localStorage.setItem('ht-active-group', activeGroupId);
     setDataLoading(true);
     Promise.all([
-      loadUserState(familyId),
-      getJoinCode(familyId),
+      loadUserState(activeGroupId),
+      getJoinCode(activeGroupId),
     ]).then(([appState, code]) => {
       setState(appState);
       setJoinCode(code);
     }).finally(() => setDataLoading(false));
-  }, [familyId]);
+  }, [activeGroupId]);
 
   // ── Debounced save whenever state changes ─────────────────────────────────
   useEffect(() => {
-    if (!familyId || dataLoading) return;
+    if (!activeGroupId || dataLoading) return;
 
     setSaveStatus('saving');
     const timer = setTimeout(async () => {
       try {
-        await saveUserState(familyId, state);
+        await saveUserState(activeGroupId, state);
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
       } catch {
@@ -192,6 +211,15 @@ export default function App() {
     setState(initialState);
     setActiveTab('home');
     setVoiceOpen(false);
+  };
+
+  // ── Group added ───────────────────────────────────────────────────────────
+  const handleGroupAdded = async (newGroupId: string) => {
+    setShowGroupModal(false);
+    if (!session) return;
+    const refreshed = await getGroupsForUser(session.user.id);
+    setGroups(refreshed);
+    setActiveGroupId(newGroupId);
   };
 
   // ── Derived badge counts ──────────────────────────────────────────────────
@@ -216,17 +244,12 @@ export default function App() {
       </div>
     </div>
   );
-  if (authLoading || familyLoading) return <LoadingScreen message="Starting up…" />;
-  if (!session)   return <AuthScreen />;
-  if (!familyId)  return (
-    <FamilySetupScreen
-      userId={session.user.id}
-      onComplete={id => setFamilyId(id)}
-    />
-  );
-  if (dataLoading) return <LoadingScreen message="Loading your family data…" />;
+  if (authLoading || groupsLoading) return <LoadingScreen message="Starting up…" />;
+  if (!session) return <AuthScreen />;
+  if (dataLoading) return <LoadingScreen message="Loading…" />;
 
   const screenProps = { state, setState, setTab: setActiveTab };
+  const activeGroup = groups.find(g => g.id === activeGroupId) ?? null;
 
   return (
     <div id="root" style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
@@ -253,7 +276,11 @@ export default function App() {
             >
               🚘 Drive
             </button>
-            <UserMenu email={session.user.email ?? '?'} joinCode={joinCode} onSignOut={handleSignOut} />
+            <UserMenu
+              email={session.user.email ?? '?'}
+              joinCode={activeGroup?.is_personal ? '' : joinCode}
+              onSignOut={handleSignOut}
+            />
           </div>
         </div>
         <div className="header-subtitle">{tabTitles[activeTab]}</div>
@@ -261,7 +288,16 @@ export default function App() {
 
       {/* ── Screen content ── */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingBottom: 'calc(var(--nav-height) + 8px)' }}>
-        {activeTab === 'home'        && <HomeScreen {...screenProps} onOpenVoice={() => setVoiceOpen(true)} />}
+        {activeTab === 'home' && (
+          <HomeScreen
+            {...screenProps}
+            onOpenVoice={() => setVoiceOpen(true)}
+            groups={groups}
+            activeGroupId={activeGroupId}
+            onGroupSwitch={id => setActiveGroupId(id)}
+            onGroupAdd={() => setShowGroupModal(true)}
+          />
+        )}
         {activeTab === 'lifts'       && <LiftsScreen state={state} setState={setState} />}
         {activeTab === 'kit'         && <KitScreen state={state} setState={setState} />}
         {activeTab === 'noticeboard' && <NoticeboardScreen state={state} setState={setState} />}
@@ -298,6 +334,15 @@ export default function App() {
           setState={setState}
           driveMode={driveMode}
           onClose={() => { setVoiceOpen(false); setDriveMode(false); }}
+        />
+      )}
+
+      {/* ── Group modal ── */}
+      {showGroupModal && session && (
+        <GroupModal
+          userId={session.user.id}
+          onComplete={handleGroupAdded}
+          onClose={() => setShowGroupModal(false)}
         />
       )}
     </div>

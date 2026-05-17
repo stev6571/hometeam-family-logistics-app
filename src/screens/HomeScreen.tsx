@@ -1,11 +1,17 @@
 import React from 'react';
 import type { AppState, Tab } from '../types';
+import type { Group } from '../lib/db';
+import { GROUP_TYPE_META } from '../lib/db';
 
 interface Props {
   state: AppState;
   setState: React.Dispatch<React.SetStateAction<AppState>>;
   setTab: (tab: Tab) => void;
   onOpenVoice?: () => void;
+  groups?: Group[];
+  activeGroupId?: string | null;
+  onGroupSwitch?: (id: string) => void;
+  onGroupAdd?: () => void;
 }
 
 function calcReadiness(state: AppState): number {
@@ -177,7 +183,7 @@ function WeatherKitCard({ weather }: { weather: AppState['weather'] }) {
   );
 }
 
-export default function HomeScreen({ state, setState, setTab, onOpenVoice }: Props) {
+export default function HomeScreen({ state, setState, setTab, onOpenVoice, groups = [], activeGroupId, onGroupSwitch, onGroupAdd }: Props) {
   const score = calcReadiness(state);
   const { text: statusText, color: fillColor } = getReadinessStatus(score);
   const alerts = buildAlerts(state);
@@ -193,6 +199,50 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice }: Pro
 
   return (
     <div className="screen-wrapper">
+      {/* Groups row */}
+      {groups.length > 0 && (
+        <div style={{ overflowX: 'auto', paddingBottom: 4, marginBottom: 4 }}>
+          <div style={{ display: 'flex', gap: 8, padding: '0 16px', width: 'max-content' }}>
+            {groups.map(g => {
+              const meta = GROUP_TYPE_META[g.group_type] ?? GROUP_TYPE_META.other;
+              const isActive = g.id === activeGroupId;
+              return (
+                <button
+                  key={g.id}
+                  onClick={() => onGroupSwitch?.(g.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '8px 14px', borderRadius: 20, border: '1.5px solid',
+                    borderColor: isActive ? '#60a5fa' : 'rgba(255,255,255,0.12)',
+                    background: isActive ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.05)',
+                    color: isActive ? '#60a5fa' : 'rgba(255,255,255,0.75)',
+                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                    whiteSpace: 'nowrap', transition: 'all 0.15s',
+                  }}
+                >
+                  <span style={{ fontSize: 15 }}>{meta.icon}</span>
+                  <span>{g.is_personal ? 'My Space' : g.name}</span>
+                </button>
+              );
+            })}
+            <button
+              onClick={() => onGroupAdd?.()}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '8px 14px', borderRadius: 20,
+                border: '1.5px dashed rgba(255,255,255,0.2)',
+                background: 'transparent',
+                color: 'rgba(255,255,255,0.4)', fontWeight: 600, fontSize: 13,
+                cursor: 'pointer', whiteSpace: 'nowrap',
+              }}
+            >
+              <span>+</span>
+              <span>Add group</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Readiness Score */}
       <div className="readiness-card fade-up">
         <div className="readiness-row">

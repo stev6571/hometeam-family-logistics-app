@@ -20,7 +20,7 @@ export default function FamilySetupScreen({ userId, onComplete }: Props) {
     setError(null);
     setLoading(true);
     try {
-      const familyId = await createFamily(userId, name.trim() || 'My Family');
+      const familyId = await createFamily(userId, name.trim() || 'My Family', 'family');
       onComplete(familyId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
