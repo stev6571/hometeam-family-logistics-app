@@ -482,8 +482,25 @@ function DriveLayout({
   return (
     <div className="dm-overlay">
       <div className="dm-header">
-        <span className="dm-title">Drive Mode</span>
-        <button className="va-close" style={{ color: 'rgba(255,255,255,0.7)' }} onClick={onClose}>✕</button>
+        <span className="dm-title">🚘 Drive Mode</span>
+        <button
+          onClick={onClose}
+          style={{
+            background: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: 10,
+            padding: '7px 14px',
+            color: 'white',
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+          }}
+        >
+          ✕ Exit
+        </button>
       </div>
 
       <div className="dm-body">
