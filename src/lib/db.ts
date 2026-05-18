@@ -17,13 +17,15 @@ export interface Group {
 }
 
 export const GROUP_TYPE_META: Record<string, { icon: string; label: string }> = {
-  personal: { icon: '👤', label: 'My Space'   },
-  family:   { icon: '👨‍👩‍👧‍👦', label: 'Family'    },
-  sports:   { icon: '⚽', label: 'Sports Team' },
-  school:   { icon: '🏫', label: 'School'      },
-  work:     { icon: '💼', label: 'Work'         },
-  friends:  { icon: '👥', label: 'Friends'      },
-  other:    { icon: '🏠', label: 'Group'        },
+  personal: { icon: '👤', label: 'My Space'    },
+  family:   { icon: '👨‍👩‍👧‍👦', label: 'Family'     },
+  sports:   { icon: '⚽', label: 'Sports Team'  },
+  club:     { icon: '🏅', label: 'Club'         },
+  dance:    { icon: '💃', label: 'Dance Troupe' },
+  school:   { icon: '🏫', label: 'School'       },
+  work:     { icon: '💼', label: 'Work'          },
+  friends:  { icon: '👥', label: 'Friends'       },
+  other:    { icon: '🏠', label: 'Group'         },
 };
 
 // ── Group queries ─────────────────────────────────────────────────────────────
