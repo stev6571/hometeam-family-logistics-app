@@ -276,6 +276,17 @@ export default function App() {
             >
               🚘 Drive
             </button>
+            <button
+              onClick={() => setShowGroupModal(true)}
+              style={{
+                background: 'rgba(255,255,255,0.12)', border: 'none',
+                borderRadius: 8, padding: '5px 10px', fontSize: 12,
+                fontWeight: 700, color: 'rgba(255,255,255,0.8)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 4,
+              }}
+            >
+              👥 Groups
+            </button>
             <UserMenu
               email={session.user.email ?? '?'}
               joinCode={activeGroup?.is_personal ? '' : joinCode}

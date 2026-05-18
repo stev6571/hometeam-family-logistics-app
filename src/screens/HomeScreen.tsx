@@ -200,46 +200,65 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
   return (
     <div className="screen-wrapper">
       {/* Groups row */}
-      {groups.length > 0 && (
-        <div style={{ overflowX: 'auto', paddingBottom: 4, marginBottom: 4 }}>
-          <div style={{ display: 'flex', gap: 8, padding: '0 16px', width: 'max-content' }}>
-            {groups.map(g => {
-              const meta = GROUP_TYPE_META[g.group_type] ?? GROUP_TYPE_META.other;
-              const isActive = g.id === activeGroupId;
-              return (
-                <button
-                  key={g.id}
-                  onClick={() => onGroupSwitch?.(g.id)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 20, border: '1.5px solid',
-                    borderColor: isActive ? '#60a5fa' : 'rgba(255,255,255,0.12)',
-                    background: isActive ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.05)',
-                    color: isActive ? '#60a5fa' : 'rgba(255,255,255,0.75)',
-                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                    whiteSpace: 'nowrap', transition: 'all 0.15s',
-                  }}
-                >
-                  <span style={{ fontSize: 15 }}>{meta.icon}</span>
-                  <span>{g.is_personal ? 'My Space' : g.name}</span>
-                </button>
-              );
-            })}
-            <button
-              onClick={() => onGroupAdd?.()}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: '8px 14px', borderRadius: 20,
-                border: '1.5px dashed rgba(255,255,255,0.2)',
-                background: 'transparent',
-                color: 'rgba(255,255,255,0.4)', fontWeight: 600, fontSize: 13,
-                cursor: 'pointer', whiteSpace: 'nowrap',
-              }}
-            >
-              <span>+</span>
-              <span>Add group</span>
-            </button>
+      <div style={{ overflowX: 'auto', paddingBottom: 4, marginBottom: 4 }}>
+        <div style={{ display: 'flex', gap: 8, padding: '0 16px', width: 'max-content' }}>
+          {groups.map(g => {
+            const meta = GROUP_TYPE_META[g.group_type] ?? GROUP_TYPE_META.other;
+            const isActive = g.id === activeGroupId;
+            return (
+              <button
+                key={g.id}
+                onClick={() => onGroupSwitch?.(g.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 14px', borderRadius: 20, border: '1.5px solid',
+                  borderColor: isActive ? '#60a5fa' : 'rgba(255,255,255,0.12)',
+                  background: isActive ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.05)',
+                  color: isActive ? '#60a5fa' : 'rgba(255,255,255,0.75)',
+                  fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                  whiteSpace: 'nowrap', transition: 'all 0.15s',
+                }}
+              >
+                <span style={{ fontSize: 15 }}>{meta.icon}</span>
+                <span>{g.is_personal ? 'My Space' : g.name}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => onGroupAdd?.()}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              padding: '8px 14px', borderRadius: 20,
+              border: '1.5px dashed rgba(255,255,255,0.25)',
+              background: 'transparent',
+              color: 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: 13,
+              cursor: 'pointer', whiteSpace: 'nowrap',
+            }}
+          >
+            <span>+</span>
+            <span>Add group</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Nudge card — only personal space so far */}
+      {groups.length <= 1 && groups.every(g => g.is_personal) && (
+        <div
+          onClick={() => onGroupAdd?.()}
+          style={{
+            margin: '0 16px 4px', padding: '14px 16px', borderRadius: 14, cursor: 'pointer',
+            background: 'rgba(96,165,250,0.08)', border: '1.5px dashed rgba(96,165,250,0.3)',
+            display: 'flex', alignItems: 'center', gap: 12,
+          }}
+        >
+          <span style={{ fontSize: 28 }}>👨‍👩‍👧‍👦</span>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Create or join a group</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+              Add your family, sports team, club or dance troupe — then sort lifts together.
+            </div>
           </div>
+          <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.3)', fontSize: 20 }}>›</span>
         </div>
       )}
 
