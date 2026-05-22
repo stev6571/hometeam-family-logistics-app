@@ -123,11 +123,13 @@ export default function App() {
   const [joinCode, setJoinCode]         = useState('------');
   const [showGroupModal, setShowGroupModal] = useState(false);
 
-  const [activeTab, setActiveTab]   = useState<Tab>('home');
-  const [state, setState]           = useState<AppState>(initialState);
-  const [voiceOpen, setVoiceOpen]   = useState(false);
-  const [driveMode, setDriveMode]   = useState(false);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [activeTab, setActiveTab]       = useState<Tab>('home');
+  const [state, setState]               = useState<AppState>(initialState);
+  const [voiceOpen, setVoiceOpen]       = useState(false);
+  const [driveMode, setDriveMode]       = useState(false);
+  const [saveStatus, setSaveStatus]     = useState<SaveStatus>('idle');
+  const [liveConnected, setLiveConnected] = useState(false);
+  const isApplyingRealtime              = useRef(false);
 
   // ── Auth state listener ────────────────────────────────────────────────────
   useEffect(() => {
@@ -187,9 +189,34 @@ export default function App() {
     }).finally(() => setDataLoading(false));
   }, [activeGroupId]);
 
+  // ── Realtime subscription — live sync for all group members ──────────────
+  useEffect(() => {
+    if (!activeGroupId || !session) return;
+
+    const channel = supabase
+      .channel(`group-${activeGroupId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'user_app_data', filter: `family_id=eq.${activeGroupId}` },
+        (payload) => {
+          const incoming = (payload.new as { state: AppState }).state;
+          if (!incoming) return;
+          isApplyingRealtime.current = true;
+          setState(incoming);
+          setTimeout(() => { isApplyingRealtime.current = false; }, 200);
+        }
+      )
+      .subscribe(status => setLiveConnected(status === 'SUBSCRIBED'));
+
+    return () => {
+      supabase.removeChannel(channel);
+      setLiveConnected(false);
+    };
+  }, [activeGroupId, session]);
+
   // ── Debounced save whenever state changes ─────────────────────────────────
   useEffect(() => {
-    if (!activeGroupId || dataLoading) return;
+    if (!activeGroupId || dataLoading || isApplyingRealtime.current) return;
 
     setSaveStatus('saving');
     const timer = setTimeout(async () => {
@@ -261,6 +288,12 @@ export default function App() {
             Home<span>Team</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {liveConnected && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: '#34d399' }}>
+                <div style={{ width: 6, height: 6, borderRadius: 3, background: '#34d399', animation: 'dot-pulse 1.2s ease infinite alternate' }} />
+                Live
+              </div>
+            )}
             <div
               className={`save-dot ${saveStatus === 'saving' ? 'saving' : saveStatus === 'saved' ? 'saved' : saveStatus === 'error' ? 'error' : ''}`}
               title={saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved' : saveStatus === 'error' ? 'Save failed' : ''}
