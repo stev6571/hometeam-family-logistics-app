@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import type { AppState } from '../types';
+import type { AppState, KitItem } from '../types';
+import AddKitItemModal from '../components/AddKitItemModal';
 
 interface Props {
   state: AppState;
@@ -15,7 +16,13 @@ const catLabel: Record<string, string> = {
 };
 
 export default function KitScreen({ state, setState }: Props) {
-  const [filter, setFilter] = useState<'all' | 'urgent' | 'still needed'>('all');
+  const [filter, setFilter]       = useState<'all' | 'urgent' | 'still needed'>('all');
+  const [showAddKit, setShowAddKit] = useState(false);
+
+  const handleAddKit = (item: KitItem) => {
+    setState(prev => ({ ...prev, kitItems: [...prev.kitItems, item] }));
+    setShowAddKit(false);
+  };
 
   const toggleKit = (id: string) => {
     setState(prev => ({
@@ -58,7 +65,16 @@ export default function KitScreen({ state, setState }: Props) {
 
   return (
     <div className="screen-wrapper">
-      <div className="section-heading">Kit Checklist</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px 4px' }}>
+        <div className="section-heading" style={{ padding: 0, margin: 0 }}>Kit Checklist</div>
+        <button onClick={() => setShowAddKit(true)} style={{
+          background: 'rgba(96,165,250,0.15)', border: '1px solid rgba(96,165,250,0.3)',
+          borderRadius: 10, padding: '6px 14px', fontSize: 13, fontWeight: 700,
+          color: '#60a5fa', cursor: 'pointer',
+        }}>
+          + Add item
+        </button>
+      </div>
 
       {/* Progress */}
       <div className="card">
@@ -79,7 +95,7 @@ export default function KitScreen({ state, setState }: Props) {
           <div
             className="readiness-fill"
             style={{
-              width: `${Math.round((totalDone / totalItems) * 100)}%`,
+              width: `${totalItems > 0 ? Math.round((totalDone / totalItems) * 100) : 0}%`,
               background: totalDone === totalItems ? 'var(--green)' : urgentMissing.length > 0 ? 'var(--red)' : 'var(--blue)',
             }}
           />
@@ -172,9 +188,9 @@ export default function KitScreen({ state, setState }: Props) {
       {displayedKit.length === 0 && (
         <div className="card">
           <div className="empty-state">
-            <div className="empty-icon">✅</div>
-            <div className="empty-title">Nothing urgent missing</div>
-            <div className="empty-sub">All urgent items are sorted.</div>
+            <div className="empty-icon">{totalItems === 0 ? '⚽' : '✅'}</div>
+            <div className="empty-title">{totalItems === 0 ? 'No kit items yet' : 'Nothing urgent missing'}</div>
+            <div className="empty-sub">{totalItems === 0 ? 'Tap "+ Add item" to start your kit checklist.' : 'All urgent items are sorted.'}</div>
           </div>
         </div>
       )}
@@ -226,6 +242,14 @@ export default function KitScreen({ state, setState }: Props) {
           📤 Share checklist to WhatsApp
         </button>
       </div>
+
+      {showAddKit && (
+        <AddKitItemModal
+          members={state.familyMembers}
+          onSave={handleAddKit}
+          onClose={() => setShowAddKit(false)}
+        />
+      )}
     </div>
   );
 }

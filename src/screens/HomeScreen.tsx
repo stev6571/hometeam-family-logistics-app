@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { AppState, Tab } from '../types';
 import type { Group } from '../lib/db';
 import { GROUP_TYPE_META } from '../lib/db';
+import AddMemberModal from '../components/AddMemberModal';
 
 interface Props {
   state: AppState;
@@ -184,6 +185,8 @@ function WeatherKitCard({ weather }: { weather: AppState['weather'] }) {
 }
 
 export default function HomeScreen({ state, setState, setTab, onOpenVoice, groups = [], activeGroupId, onGroupSwitch, onGroupAdd }: Props) {
+  const [showAddMember, setShowAddMember] = useState(false);
+
   const score = calcReadiness(state);
   const { text: statusText, color: fillColor } = getReadinessStatus(score);
   const alerts = buildAlerts(state);
@@ -195,6 +198,17 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
       ...prev,
       chores: prev.chores.map(c => c.id === id ? { ...c, completed: !c.completed } : c),
     }));
+  };
+
+  const handleAddMember = (member: AppState['familyMembers'][0], addAsDriver: boolean) => {
+    setState(prev => ({
+      ...prev,
+      familyMembers: [...prev.familyMembers, member],
+      drivers: addAsDriver
+        ? [...prev.drivers, { id: `drv-${member.id}`, name: member.name, seats: 4, passengers: [] }]
+        : prev.drivers,
+    }));
+    setShowAddMember(false);
   };
 
   return (
@@ -261,6 +275,31 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
           <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.3)', fontSize: 20 }}>›</span>
         </div>
       )}
+
+      {/* People */}
+      <div style={{ padding: '4px 16px 8px', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        {state.familyMembers.map(m => (
+          <div key={m.id} style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 20, padding: '5px 12px', fontSize: 13, fontWeight: 600,
+          }}>
+            <span>{m.avatar}</span>
+            <span>{m.name}</span>
+          </div>
+        ))}
+        <button
+          onClick={() => setShowAddMember(true)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            background: 'transparent', border: '1.5px dashed rgba(255,255,255,0.25)',
+            borderRadius: 20, padding: '5px 12px', fontSize: 13, fontWeight: 600,
+            color: 'rgba(255,255,255,0.5)', cursor: 'pointer',
+          }}
+        >
+          + Add person
+        </button>
+      </div>
 
       {/* Readiness Score */}
       <div className="readiness-card fade-up">
@@ -446,6 +485,13 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
       </div>
 
       <div style={{ height: 8 }} />
+
+      {showAddMember && (
+        <AddMemberModal
+          onSave={handleAddMember}
+          onClose={() => setShowAddMember(false)}
+        />
+      )}
     </div>
   );
 }

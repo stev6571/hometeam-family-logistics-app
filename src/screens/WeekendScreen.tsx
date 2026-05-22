@@ -1,5 +1,6 @@
-import React from 'react';
-import type { AppState } from '../types';
+import React, { useState } from 'react';
+import type { AppState, Event } from '../types';
+import AddEventModal from '../components/AddEventModal';
 
 interface Props {
   state: AppState;
@@ -21,6 +22,8 @@ const sportColors: Record<string, string> = {
 };
 
 export default function WeekendScreen({ state, setState }: Props) {
+  const [showAddEvent, setShowAddEvent] = useState(false);
+
   const saturdayEvents = state.events.filter(e => e.date === 'Saturday').sort((a, b) => a.time.localeCompare(b.time));
   const sundayEvents = state.events.filter(e => e.date === 'Sunday').sort((a, b) => a.time.localeCompare(b.time));
 
@@ -37,6 +40,25 @@ export default function WeekendScreen({ state, setState }: Props) {
     });
     const msg = `🏆 HomeTeam Weekend Itinerary:\n\n${lines.join('\n')}\n\nWeekend ready: ${readinessPercent}%`;
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  };
+
+  const handleAddEvent = (event: Event, needsLift: boolean) => {
+    const member = state.familyMembers.find(m => m.id === event.memberId);
+    setState(prev => ({
+      ...prev,
+      events: [...prev.events, event],
+      liftRequests: needsLift ? [...prev.liftRequests, {
+        id: `lr-${Date.now()}`,
+        childId: event.memberId,
+        childName: member?.name ?? '',
+        eventId: event.id,
+        eventTitle: event.title,
+        time: event.time,
+        location: event.location,
+        assignedDriverId: null,
+      }] : prev.liftRequests,
+    }));
+    setShowAddEvent(false);
   };
 
   const toggleKitChecked = (eventId: string) => {
@@ -98,7 +120,16 @@ export default function WeekendScreen({ state, setState }: Props) {
 
   return (
     <div className="screen-wrapper">
-      <div className="section-heading">Weekend Ready</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px 4px' }}>
+        <div className="section-heading" style={{ padding: 0, margin: 0 }}>Weekend Ready</div>
+        <button onClick={() => setShowAddEvent(true)} style={{
+          background: 'rgba(96,165,250,0.15)', border: '1px solid rgba(96,165,250,0.3)',
+          borderRadius: 10, padding: '6px 14px', fontSize: 13, fontWeight: 700,
+          color: '#60a5fa', cursor: 'pointer',
+        }}>
+          + Add event
+        </button>
+      </div>
 
       {/* Readiness Bar */}
       <div className="card">
@@ -140,11 +171,11 @@ export default function WeekendScreen({ state, setState }: Props) {
 
       {/* Events */}
       {saturdayEvents.length === 0 && sundayEvents.length === 0 ? (
-        <div className="card">
+        <div className="card" style={{ cursor: 'pointer' }} onClick={() => setShowAddEvent(true)}>
           <div className="empty-state">
             <div className="empty-icon">📅</div>
-            <div className="empty-title">No events this weekend</div>
-            <div className="empty-sub">Enjoy the break!</div>
+            <div className="empty-title">No events added yet</div>
+            <div className="empty-sub">Tap "+ Add event" to start planning the weekend.</div>
           </div>
         </div>
       ) : (
@@ -176,6 +207,14 @@ export default function WeekendScreen({ state, setState }: Props) {
           📤 Share weekend itinerary to WhatsApp
         </button>
       </div>
+
+      {showAddEvent && (
+        <AddEventModal
+          members={state.familyMembers}
+          onSave={handleAddEvent}
+          onClose={() => setShowAddEvent(false)}
+        />
+      )}
     </div>
   );
 }
