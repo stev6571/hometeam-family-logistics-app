@@ -315,11 +315,6 @@ export default function App() {
         {activeTab === 'weekend'     && <WeekendScreen state={state} setState={setState} />}
       </div>
 
-      {/* ── Floating mic ── */}
-      <button className="fab-mic" onClick={() => setVoiceOpen(true)} aria-label="Talk to HomeTeam">
-        🎙
-      </button>
-
       {/* ── Bottom nav ── */}
       <nav className="bottom-nav">
         {tabs.map(tab => {

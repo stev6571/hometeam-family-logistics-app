@@ -435,19 +435,7 @@ html, body {
   margin-bottom: 12px;
 }
 
-.assistant-icon {
-  width: 34px;
-  height: 34px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.assistant-title { font-size: 14px; font-weight: 800; }
-.assistant-subtitle { font-size: 11px; color: rgba(255,255,255,0.55); }
+.assistant-title { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.6); }
 
 .assistant-prompt {
   background: rgba(255,255,255,0.08);
@@ -1038,41 +1026,6 @@ select {
   to   { opacity: 1; }
 }
 
-/* ─── Talk & Go floating mic button ─────────────────────────────────────────── */
-
-.fab-mic {
-  position: fixed;
-  bottom: calc(var(--nav-height) + 16px);
-  right: 20px;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: var(--navy);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 16px rgba(26,39,68,0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  cursor: pointer;
-  z-index: 150;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.fab-mic:active { transform: scale(0.93); }
-
-.fab-mic.listening {
-  background: var(--red);
-  animation: fab-pulse 1.4s infinite;
-  box-shadow: 0 0 0 0 rgba(239,68,68,0.4);
-}
-
-@keyframes fab-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
-  70%  { box-shadow: 0 0 0 14px rgba(239,68,68,0); }
-  100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-}
 
 /* ─── Voice Assistant bottom sheet ───────────────────────────────────────────── */
 
@@ -1421,27 +1374,7 @@ select {
 
 .talk-card-text { flex: 1; }
 .talk-card-title { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
-.talk-card-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 10px; }
-
-.talk-card-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.talk-chip {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.85);
-  border-radius: var(--radius-full);
-  padding: 3px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.12s;
-}
-
-.talk-chip:hover { background: rgba(255,255,255,0.2); }
+.talk-card-sub { font-size: 12px; color: rgba(255,255,255,0.6); }
 
 .talk-card-btn {
   background: white;

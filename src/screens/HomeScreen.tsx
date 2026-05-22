@@ -273,10 +273,7 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
             <div className="readiness-status">{statusText}</div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 40, marginBottom: 4 }}>
-              {score >= 90 ? '🎉' : score >= 70 ? '💪' : score >= 40 ? '🔄' : '😅'}
-            </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
               {state.events.length} events this weekend
             </div>
           </div>
@@ -303,16 +300,11 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
       {/* Talk & Go card */}
       <div className="talk-card fade-up">
         <div className="talk-card-text">
-          <div className="talk-card-title">🎙 Talk &amp; Go</div>
-          <div className="talk-card-sub">Say it once. HomeTeam sorts it.</div>
-          <div className="talk-card-chips">
-            {["Who needs a lift?", "What's missing?", "Urgent notices"].map(chip => (
-              <span key={chip} className="talk-chip">{chip}</span>
-            ))}
-          </div>
+          <div className="talk-card-title">Talk &amp; Go</div>
+          <div className="talk-card-sub">Say what needs sorting. HomeTeam handles it.</div>
         </div>
         <button className="talk-card-btn" onClick={() => onOpenVoice?.()}>
-          🎙 Talk now
+          🎙 Open
         </button>
       </div>
 
@@ -358,10 +350,8 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
       {prompts.length > 0 && (
         <div className="assistant-card fade-up">
           <div className="assistant-header">
-            <div className="assistant-icon">🤖</div>
             <div>
-              <div className="assistant-title">HomeTeam Assistant</div>
-              <div className="assistant-subtitle">Heads-up for the weekend</div>
+              <div className="assistant-title">Heads-up for the weekend</div>
             </div>
           </div>
           {prompts.map((p, i) => (
@@ -395,8 +385,13 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                  <span className={`pill pill-${ev.transportAssigned ? 'green' : 'red'}`} style={{ fontSize: 11, padding: '2px 7px' }}>
-                    {ev.transportAssigned ? 'Sorted' : 'Needs a lift'}
+                  <span style={{
+                    fontSize: 11, padding: '2px 7px', borderRadius: 6, fontWeight: 600,
+                    border: `1px solid ${ev.transportAssigned ? 'rgba(52,211,153,0.4)' : 'rgba(248,113,113,0.4)'}`,
+                    color: ev.transportAssigned ? '#34d399' : '#f87171',
+                    background: 'transparent',
+                  }}>
+                    {ev.transportAssigned ? 'Sorted' : 'No lift'}
                   </span>
                 </div>
               </div>
