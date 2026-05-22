@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import './index.css';
 import type { Tab, AppState } from './types';
-import { initialState } from './mockData';
+import { initialState, blankState } from './mockData';
 import { supabase, supabaseMisconfigured } from './lib/supabase';
 import { getGroupsForUser, getJoinCode, loadUserState, saveUserState, createPersonalGroup } from './lib/db';
 import type { Group } from './lib/db';
@@ -208,7 +208,7 @@ export default function App() {
   // ── Sign out ──────────────────────────────────────────────────────────────
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setState(initialState);
+    setState(blankState());
     setActiveTab('home');
     setVoiceOpen(false);
   };

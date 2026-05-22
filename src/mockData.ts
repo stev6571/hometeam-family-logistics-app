@@ -192,3 +192,18 @@ export const initialState: AppState = {
     description: 'Heavy rain expected 9am–1pm Saturday',
   },
 };
+
+export function blankState(): AppState {
+  return {
+    familyMembers: [],
+    events: [],
+    drivers: [],
+    liftRequests: [],
+    kitItems: [],
+    notices: [],
+    shoppingItems: [],
+    chores: [],
+    badges: [],
+    weather: { condition: 'sunny', temp: 14, description: 'Looks good for the weekend' },
+  };
+}

@@ -1,9 +1,19 @@
 import { supabase } from './supabase';
 import type { AppState } from '../types';
-import { initialState } from '../mockData';
 
 function freshState(): AppState {
-  return JSON.parse(JSON.stringify(initialState));
+  return {
+    familyMembers: [],
+    events: [],
+    drivers: [],
+    liftRequests: [],
+    kitItems: [],
+    notices: [],
+    shoppingItems: [],
+    chores: [],
+    badges: [],
+    weather: { condition: 'sunny', temp: 14, description: 'Looks good for the weekend' },
+  };
 }
 
 // ── Group types ───────────────────────────────────────────────────────────────
