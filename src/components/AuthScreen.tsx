@@ -59,7 +59,7 @@ export default function AuthScreen() {
             Home<span>Team</span>
           </div>
         </div>
-        <div className="header-subtitle">Family sports logistics, sorted</div>
+        <div className="header-subtitle">Less chaos. More Saturdays.</div>
       </div>
 
       <div className="auth-body">
@@ -67,11 +67,11 @@ export default function AuthScreen() {
         <div className="auth-hero">
           <div className="auth-hero-icons">🏉 ⚽ 🏊 🚗</div>
           <div className="auth-hero-title">
-            {mode === 'signup' ? 'Set up your family' : 'Welcome back'}
+            {mode === 'signup' ? "Let's get you sorted" : 'Welcome back'}
           </div>
           <div className="auth-hero-sub">
             {mode === 'signup'
-              ? 'Track lifts, kit and plans for the whole family'
+              ? 'Lifts sorted. Kit checked. Everyone where they need to be.'
               : 'Pick up where you left off'}
           </div>
         </div>
