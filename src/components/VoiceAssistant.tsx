@@ -23,14 +23,14 @@ interface Props {
 // ─── Example prompts ─────────────────────────────────────────────────────────
 
 const EXAMPLES = [
-  "Jack needs a lift Saturday morning",
-  "Add gum shield to Jack's rugby kit",
-  "Mark Alfie's boots as packed",
-  "What's missing this weekend?",
-  "Read urgent notices",
-  "Who's driving Liam?",
-  "Ask the rugby group if anyone can take Jack",
-  "What time is Noah swimming?",
+  "Jack's rugby is Saturday at 9:30 and he still hasn't got a lift — can someone sort it?",
+  "What's still not sorted for this weekend?",
+  "Liam's football kit still needs washing",
+  "Message the rugby parents — Jack needs a lift to Manor Fields by 9",
+  "Read the urgent club notice",
+  "Mark Jack's gum shield as packed",
+  "Who can take Alfie to football training Saturday at 10?",
+  "What time does Noah swim on Sunday?",
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -451,7 +451,7 @@ export default function VoiceAssistant({ state, setState, onClose, driveMode = f
                   <input
                     ref={inputRef}
                     className="va-text-input"
-                    placeholder='e.g. "Jack needs a lift Saturday"'
+                    placeholder='e.g. "Jack still needs a lift Saturday at 9"'
                     value={textInput}
                     onChange={e => setTextInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleTextSubmit()}
@@ -511,7 +511,7 @@ function DriveLayout({
               <span style={{ fontSize: 52 }}>🎙</span>
             </button>
             <div className="dm-examples">
-              {["What's next?", "Who needs picking up?", "What's missing this weekend?", "Read urgent notices"].map(ex => (
+              {["What's still not sorted?", "Who needs a lift tomorrow?", "Read the urgent notice", "Jack's lift — sort it"].map(ex => (
                 <div key={ex} className="dm-example">{ex}</div>
               ))}
             </div>
