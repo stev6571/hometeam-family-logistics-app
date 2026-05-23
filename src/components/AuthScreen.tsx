@@ -55,7 +55,7 @@ export default function AuthScreen() {
       <div className="app-header" style={{ flex: 'none' }}>
         <div className="header-top">
           <div className="header-logo" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <img src="/logo.svg" alt="" width="26" height="26" style={{ flexShrink: 0 }} />
+            <img src="/icon.svg" alt="" width="26" height="26" style={{ flexShrink: 0 }} />
             Sort<span>ed</span>
           </div>
         </div>

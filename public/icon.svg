@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00c864"/>
+      <stop offset="100%" stop-color="#009b4e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="112" ry="112" fill="url(#bg)"/>
+
+  <!-- White tick mark, centred slightly above middle to leave room for wordmark -->
+  <polyline
+    points="118,240 210,332 394,148"
+    fill="none"
+    stroke="white"
+    stroke-width="56"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- White wordmark: "sorted" -->
+  <text
+    x="256"
+    y="436"
+    text-anchor="middle"
+    font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="88"
+    font-weight="700"
+    letter-spacing="-2"
+    fill="white"
+  >sorted</text>
+</svg>

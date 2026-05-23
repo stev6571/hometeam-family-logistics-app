@@ -42,7 +42,7 @@ const tabTitles: Record<Tab, string> = {
 function LoadingScreen({ message }: { message: string }) {
   return (
     <div className="loading-screen">
-      <img src="/logo.svg" alt="Sorted" width="56" height="56" style={{ marginBottom: 4 }} />
+      <img src="/icon.svg" alt="Sorted" width="56" height="56" style={{ marginBottom: 4 }} />
       <div className="loading-logo">Sort<span>ed</span></div>
       <div className="loading-spinner" />
       <div className="loading-sub">{message}</div>
@@ -264,7 +264,7 @@ export default function App() {
   // ── Render gates ──────────────────────────────────────────────────────────
   if (supabaseMisconfigured) return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100dvh', padding: 32, fontFamily: 'sans-serif', textAlign: 'center', background: '#1a2744', color: 'white', gap: 16 }}>
-      <img src="/logo.svg" width="56" height="56" alt="" />
+      <img src="/icon.svg" width="56" height="56" alt="" />
       <div style={{ fontSize: 20, fontWeight: 700 }}>Supabase not configured</div>
       <div style={{ fontSize: 14, opacity: 0.7, maxWidth: 320 }}>
         Add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> to your Vercel environment variables, then redeploy.
@@ -284,7 +284,7 @@ export default function App() {
       <div className="app-header">
         <div className="header-top">
           <div className="header-logo" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <img src="/logo.svg" alt="" width="28" height="28" style={{ flexShrink: 0 }} />
+            <img src="/icon.svg" alt="" width="28" height="28" style={{ flexShrink: 0 }} />
             Sort<span>ed</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
