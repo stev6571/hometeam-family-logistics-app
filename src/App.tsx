@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import './index.css';
 import type { Tab, AppState } from './types';
-import { initialState, blankState } from './mockData';
+import { blankState } from './mockData';
 import { supabase, supabaseMisconfigured } from './lib/supabase';
 import { getGroupsForUser, getJoinCode, loadUserState, saveUserState, createPersonalGroup } from './lib/db';
 import type { Group } from './lib/db';
@@ -124,7 +124,7 @@ export default function App() {
   const [showGroupModal, setShowGroupModal] = useState(false);
 
   const [activeTab, setActiveTab]       = useState<Tab>('home');
-  const [state, setState]               = useState<AppState>(initialState);
+  const [state, setState]               = useState<AppState>(blankState);
   const [voiceOpen, setVoiceOpen]       = useState(false);
   const [driveMode, setDriveMode]       = useState(false);
   const [saveStatus, setSaveStatus]     = useState<SaveStatus>('idle');
