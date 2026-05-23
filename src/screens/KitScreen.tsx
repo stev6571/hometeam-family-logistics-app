@@ -56,7 +56,7 @@ export default function KitScreen({ state, setState }: Props) {
 
   const shareChecklist = () => {
     const lines = state.kitItems.map(k => `${k.completed ? '✅' : '❌'} ${k.memberName}: ${k.name}`);
-    const msg = `📋 HomeTeam Kit Checklist:\n${lines.join('\n')}\n\n${totalDone}/${totalItems} sorted.`;
+    const msg = `📋 Sorted — Kit Checklist:\n${lines.join('\n')}\n\n${totalDone}/${totalItems} sorted.`;
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   };
 

@@ -241,9 +241,9 @@ export function generateWhatsAppMessage(intent: CommandIntent, state: AppState):
     if (intent.childName) {
       return `Hi all 👋 Can anyone help with a lift for ${intent.childName} this weekend? Thank you! 🙏`;
     }
-    return intent.messageText || 'Hi team! Check HomeTeam for the latest weekend plan. 👍';
+    return intent.messageText || 'Hi team! Check Sorted for the latest weekend plan. 👍';
   }
-  return 'Hi team! Heads up for the weekend — check the HomeTeam app for the latest. 👋';
+  return 'Hi team! Heads up for the weekend — check the Sorted app for the latest. 👋';
 }
 
 // ─── Main parser ──────────────────────────────────────────────────────────────

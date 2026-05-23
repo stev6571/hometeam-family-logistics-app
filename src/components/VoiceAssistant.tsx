@@ -331,7 +331,7 @@ export default function VoiceAssistant({ state, setState, onClose, driveMode = f
           <div className="va-header-left">
             <div className="va-header-icon">🎙️</div>
             <div>
-              <div className="va-title">Talk to HomeTeam</div>
+              <div className="va-title">Talk to Sorted</div>
               <div className="va-subtitle">
                 {status === 'idle'       ? 'Say what you need sorted' :
                  status === 'listening'  ? 'Listening…'               :

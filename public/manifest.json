@@ -1,0 +1,12 @@
+{
+  "name": "Sorted",
+  "short_name": "Sorted",
+  "description": "Less chaos. More Saturdays.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a2744",
+  "theme_color": "#1a2744",
+  "icons": [
+    { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

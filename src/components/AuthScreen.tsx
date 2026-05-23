@@ -56,7 +56,7 @@ export default function AuthScreen() {
         <div className="header-top">
           <div className="header-logo" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <img src="/logo.svg" alt="" width="26" height="26" style={{ flexShrink: 0 }} />
-            Home<span>Team</span>
+            Sort<span>ed</span>
           </div>
         </div>
         <div className="header-subtitle">Less chaos. More Saturdays.</div>
@@ -126,7 +126,7 @@ export default function AuthScreen() {
           <div className="auth-toggle">
             {mode === 'signin' ? (
               <>
-                New to HomeTeam?{' '}
+                New to Sorted?{' '}
                 <button className="auth-toggle-btn" onClick={() => { setMode('signup'); setError(null); setSuccess(null); }}>
                   Create an account
                 </button>

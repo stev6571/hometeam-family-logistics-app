@@ -42,8 +42,8 @@ const tabTitles: Record<Tab, string> = {
 function LoadingScreen({ message }: { message: string }) {
   return (
     <div className="loading-screen">
-      <img src="/logo.svg" alt="HomeTeam" width="56" height="56" style={{ marginBottom: 4 }} />
-      <div className="loading-logo">Home<span>Team</span></div>
+      <img src="/logo.svg" alt="Sorted" width="56" height="56" style={{ marginBottom: 4 }} />
+      <div className="loading-logo">Sort<span>ed</span></div>
       <div className="loading-spinner" />
       <div className="loading-sub">{message}</div>
     </div>
@@ -285,7 +285,7 @@ export default function App() {
         <div className="header-top">
           <div className="header-logo" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <img src="/logo.svg" alt="" width="28" height="28" style={{ flexShrink: 0 }} />
-            Home<span>Team</span>
+            Sort<span>ed</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {liveConnected && (

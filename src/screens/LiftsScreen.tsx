@@ -106,7 +106,7 @@ export default function LiftsScreen({ state, setState }: Props) {
         : 'Not sorted yet';
       return `• ${lr.childName} (${lr.eventTitle} ${lr.time}) → ${driver}`;
     });
-    const msg = `🚗 HomeTeam Lifts Plan:\n${lines.join('\n')}`;
+    const msg = `🚗 Sorted — Lifts Plan:\n${lines.join('\n')}`;
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   };
 

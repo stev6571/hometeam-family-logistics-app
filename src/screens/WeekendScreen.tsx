@@ -38,7 +38,7 @@ export default function WeekendScreen({ state, setState }: Props) {
       const member = state.familyMembers.find(m => m.id === e.memberId);
       return `• ${e.date} ${e.time}: ${member?.name} - ${e.title} @ ${e.location}`;
     });
-    const msg = `🏆 HomeTeam Weekend Itinerary:\n\n${lines.join('\n')}\n\nWeekend ready: ${readinessPercent}%`;
+    const msg = `🏆 Sorted — Weekend Itinerary:\n\n${lines.join('\n')}\n\nWeekend ready: ${readinessPercent}%`;
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   };
 
@@ -141,7 +141,7 @@ export default function WeekendScreen({ state, setState }: Props) {
             </div>
           </div>
           <span className={`pill pill-${readinessPercent >= 70 ? 'green' : readinessPercent >= 40 ? 'orange' : 'red'}`}>
-            {readinessPercent >= 90 ? 'HomeTeam ready 🎉' : readinessPercent >= 70 ? 'Nearly ready' : readinessPercent >= 40 ? 'Getting there' : 'Needs work'}
+            {readinessPercent >= 90 ? 'All sorted 🎉' : readinessPercent >= 70 ? 'Nearly ready' : readinessPercent >= 40 ? 'Getting there' : 'Needs work'}
           </span>
         </div>
         <div className="readiness-bar">

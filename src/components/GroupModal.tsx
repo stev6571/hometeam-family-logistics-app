@@ -58,12 +58,12 @@ export default function GroupModal({ userId, onComplete, onClose }: Props) {
     }
   };
 
-  const shareText = `Join our ${createdName} on HomeTeam!\n\nEnter code: ${createdCode}\n${APP_URL}`;
+  const shareText = `Join our ${createdName} on Sorted!\n\nEnter code: ${createdCode}\n${APP_URL}`;
 
   const handleShare = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Join HomeTeam', text: shareText });
+        await navigator.share({ title: 'Join Sorted', text: shareText });
       } catch { /* user cancelled */ }
     } else {
       await navigator.clipboard.writeText(shareText);

@@ -57,7 +57,7 @@ function getReadinessStatus(score: number): { text: string; color: string } {
   if (score < 40) return { text: 'Still a bit of chaos', color: '#f87171' };
   if (score < 70) return { text: 'Getting there', color: '#fbbf24' };
   if (score < 90) return { text: 'Nearly ready', color: '#60a5fa' };
-  return { text: 'HomeTeam ready 🎉', color: '#34d399' };
+  return { text: 'All sorted 🎉', color: '#34d399' };
 }
 
 function buildAlerts(state: AppState) {
@@ -340,7 +340,7 @@ export default function HomeScreen({ state, setState, setTab, onOpenVoice, group
       <div className="talk-card fade-up">
         <div className="talk-card-text">
           <div className="talk-card-title">Talk &amp; Go</div>
-          <div className="talk-card-sub">Say what needs sorting. HomeTeam handles it.</div>
+          <div className="talk-card-sub">Say what needs sorting. Sorted handles it.</div>
         </div>
         <button className="talk-card-btn" onClick={() => onOpenVoice?.()}>
           🎙 Open
